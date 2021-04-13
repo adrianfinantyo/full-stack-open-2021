@@ -1,13 +1,56 @@
 import React, { useState } from 'react'
 
-const List = ({ persons }) => {
-  return(
-    persons.map((data, index) => <p key={ index }>{ data.name } { data.number }</p>)
+const Header = ({ title }) => {
+  return <h1>{title}</h1>
+}
+
+const Filter = ({ newFilter, handleNewFilter }) => {
+  return (
+      <form>
+          <div>
+              filter shown with <input value={newFilter} onChange={handleNewFilter} />
+          </div>
+      </form>
   )
 }
 
+const Form = ({ handleNewPersonSubmit, handleNewName, handleNewNumber, newName, newNumber }) => {
+  return (
+      <form onSubmit={handleNewPersonSubmit}>
+          <div>
+              name: <input value={newName} onChange={handleNewName} />
+          </div>
+          <div>
+              number: <input value={newNumber} onChange={handleNewNumber} />
+          </div>
+          <div>
+              <button type="submit">add</button>
+          </div>
+      </form>
+  )
+}
+
+const List = ({ persons, newFilter }) => {
+  if (newFilter !== '') {
+      let arrFilter = persons.filter(person => person.name.toLocaleLowerCase().includes(newFilter.toLocaleLowerCase()))
+      return arrFilter.map((data, index) => <p key={index}>{data.name} {data.number}</p>)
+  }
+  else {
+      return (
+          persons.map((data, index) => <p key={index}>{data.name} {data.number}</p>)
+      )
+  }
+}
+
 const App = () => {
-  const [ persons, setPersons ] = useState([]) 
+  const [ persons, setPersons ] = useState([
+    /* data examples for testing purposes
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
+    */
+  ])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
@@ -26,7 +69,6 @@ const App = () => {
   }
 
   const handleNewPersonSubmit = event => {
-    console.log('button clicked', event.target)
     const pushData = () => {
       let newTemp = {name: newName, number: newNumber}
       temp.push(newTemp)
@@ -38,16 +80,16 @@ const App = () => {
     else{
       let pushFlag = 1
       for(let i=0; i<persons.length; i++){
-        let compare = (persons[i].name).localeCompare(newName)
+        let compare = (persons[i].name.toLowerCase())
+                      .localeCompare(newName.toLocaleLowerCase())
         if(compare === 0){
-          alert(`${newName} is already added to phonebook`)
+          alert(`${persons[i].name} is already added to phonebook`)
           pushFlag = 0
           break
         }
       }
       if(pushFlag === 1){
         pushData();
-        console.log("test")
       }
     }
     event.preventDefault()
@@ -55,27 +97,18 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <form>
-        <div>
-        filter shown with <input value={ newFilter } onChange={ handleNewFilter }/>
-        </div>
-      </form>
-      <h2>add a new</h2>
-      <form onSubmit={ handleNewPersonSubmit }>
-        <div>
-          name: <input value={ newName } onChange={ handleNewName }/>
-        </div>
-        <div>
-          number: <input value={ newNumber } onChange={ handleNewNumber }/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {console.log(persons)}
-      <List persons={ persons }></List>
+      <Header title="Phonebook"></Header>
+      <Filter newFilter={newFilter} handleNewFilter={handleNewFilter}></Filter>
+      <Header title="add a new"></Header>
+      <Form
+        handleNewName={ handleNewName }
+        handleNewNumber={ handleNewNumber }
+        handleNewPersonSubmit={ handleNewPersonSubmit }
+        newName={ newName }
+        newNumber={ newNumber }
+      ></Form>
+      <Header title="Numbers"></Header>
+      <List persons={ persons } newFilter={ newFilter }></List>
     </div>
   )
 }
