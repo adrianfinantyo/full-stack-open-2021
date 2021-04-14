@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import personService from "./Services_Person"
 
 const Header = ({ title }) => {
   return <h1>{title}</h1>
@@ -43,18 +44,17 @@ const List = ({ persons, newFilter }) => {
 }
 
 const App = () => {
-  const [ persons, setPersons ] = useState([
-    /* data examples for testing purposes
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-    */
-  ])
+  const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
   const temp = [...persons]
+
+  useEffect(() => {
+    personService.getAll().then(initalPersons => {
+      setPersons(initalPersons);
+    });
+  }, []);
 
   const handleNewName = event => {
     setNewName(event.target.value)
@@ -73,6 +73,7 @@ const App = () => {
       let newTemp = {name: newName, number: newNumber}
       temp.push(newTemp)
       setPersons(temp)
+      personService.update(newTemp)
     }
     if(persons.length === 0){
       pushData();
