@@ -1,9 +1,49 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const Details = ({country}) => {
+  return(
+    <div>
+      <h1>{ country.name }</h1>
+      <p>capital { country.capital }</p>
+      <p>population { country.population }</p>
+      <h3>languages</h3>
+      <ul>
+        {(country.languages).map((data, index) => <li key={ index }>{ data.name }</li>)}
+      </ul>
+      <img src={ country.flag } width={ 300 } alt={ country.name }></img>
+    </div>
+  )
+}
 
 const List = ({ countries, filter }) => {
-
+  const [showDetails, setShowDetails] = useState(false)
+  let arrFilter = countries.filter(country => country.name.toLowerCase()
+                                              .includes(filter.toLowerCase()))
+  const handleShowDetails = () => {
+    setShowDetails(true)
+  }
+  console.log(arrFilter)
+  if(arrFilter.length === 1){
+    return <Details country={ arrFilter[0] }></Details>
+  }
+  else if(arrFilter.length < 10){
+    return (
+      <div>
+        {arrFilter.map((data, index) => 
+        <div>
+          <p key={ index }>{ data.name }
+          <button onClick={handleShowDetails}>show</button>
+          </p>
+          {showDetails ? <Details country={ data }/> : null}
+        </div>
+        )}
+      </div>
+    )
+  }
+  else{
+    return <p>Too many matches, specify another filter</p>
+  }
 }
 
 const App = () => {
@@ -19,7 +59,7 @@ const App = () => {
     setFilter(event.target.value)
   }
 
-  console.log(countries) 
+  //console.log(countries) 
 
   return (
     <div>
@@ -28,7 +68,7 @@ const App = () => {
           find countries <input value={ filter } onChange={ handleFilter } />
         </div>
       </form>
-      <List countries={ countries } filter={ filter } ></List>
+      <List filter={ filter } countries={ countries }></List>
     </div>
   )
 }
