@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import personService from "./Services_Person"
+import * as personService from "./Services_Person"
 
 const Header = ({ title }) => {
   return <h1>{title}</h1>
@@ -31,15 +31,27 @@ const Form = ({ handleNewPersonSubmit, handleNewName, handleNewNumber, newName, 
   )
 }
 
-const List = ({ persons, newFilter }) => {
+const DeleteButton = ({ person, deletePerson }) => {
+  return(
+    <button onClick={() => deletePerson(person.id, person.name)}>Delete</button>
+  )
+}
+
+const List = ({ persons, newFilter, deletePerson }) => {
   if (newFilter !== '') {
       let arrFilter = persons.filter(person => person.name.toLocaleLowerCase().includes(newFilter.toLocaleLowerCase()))
       return arrFilter.map((data, index) => <p key={index}>{data.name} {data.number}</p>)
   }
   else {
       return (
-          persons.map((data, index) => <p key={index}>{data.name} {data.number}</p>)
+          persons.map((data, index) => (
+            <div key={ index }>
+              <p>{data.name} {data.number}</p>
+              <DeleteButton person={ data } deletePerson={ deletePerson }></DeleteButton>
+            </div>
+          )
       )
+    )
   }
 }
 
@@ -48,13 +60,20 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
-  const temp = [...persons]
 
   useEffect(() => {
     personService.getAll().then(initalPersons => {
       setPersons(initalPersons);
     });
   }, []);
+
+  const deletePerson = (id, name) => {
+    if(window.confirm(`Delete ${name}?`)){
+      personService.deletePerson(id).then(response => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+    }
+  }
 
   const handleNewName = event => {
     setNewName(event.target.value)
@@ -71,9 +90,9 @@ const App = () => {
   const handleNewPersonSubmit = event => {
     const pushData = () => {
       let newTemp = {name: newName, number: newNumber}
-      temp.push(newTemp)
-      setPersons(temp)
-      personService.update(newTemp)
+      personService.create(newTemp).then(response => {
+        setPersons([...persons, response])
+      })
     }
     if(persons.length === 0){
       pushData();
@@ -109,7 +128,7 @@ const App = () => {
         newNumber={ newNumber }
       ></Form>
       <Header title="Numbers"></Header>
-      <List persons={ persons } newFilter={ newFilter }></List>
+      <List persons={ persons } newFilter={ newFilter } deletePerson={ deletePerson } ></List>
     </div>
   )
 }

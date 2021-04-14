@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 
 const Weather = ({ city }) => {
     const [weatherData, setWeatherData] = useState({})
-    const apiKey = "0ea15957fae956523c5fc7dcb44de6df"
+    const apiKey = "3aa51de78f9ea4a885eab0880d6f1e6c"
     const baseUrl = "http://api.weatherstack.com/"
 
     useEffect(() => {
@@ -18,9 +18,9 @@ const Weather = ({ city }) => {
 
     return(
         <div>
-            <p>temperature: { weatherData.temperature } Celcius</p>
+            <p><b>temperature:</b> { weatherData.temperature } Celcius</p>
             <img src={ weatherData.icon } width={ 100 } alt={ city }></img>
-            <p>wind: { weatherData.windSpeed } direction { weatherData.windDirection }</p>
+            <p><b>wind:</b> { weatherData.windSpeed } direction { weatherData.windDirection }</p>
         </div>
     )
 }

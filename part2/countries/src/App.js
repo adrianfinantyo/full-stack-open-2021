@@ -19,8 +19,18 @@ const Details = ({country}) => {
   )
 }
 
-const List = ({ countries, filter}) => {
+const ShowButton = ({ country }) => {
   const [showDetails, setShowDetails] = useState(false)
+  return(
+    <div>
+      <button onClick={() => setShowDetails(true)}>show</button>
+      {showDetails ? <Details country={ country }/> : null}
+    </div>
+  )
+}
+
+const List = ({ countries, filter}) => {
+  
   let arrFilter = countries.filter(country => country.name.toLowerCase()
                                               .includes(filter.toLowerCase()))
   //console.log(arrFilter)
@@ -32,10 +42,10 @@ const List = ({ countries, filter}) => {
       <div>
         {arrFilter.map((data, index) => 
         <div key={ index }>
-          <p>{ data.name }
-          <button onClick={() => setShowDetails(true)}>show</button>
-          </p>
-          {showDetails ? <Details country={ data }/> : null}
+          <div style={ {padding: '10px'} }>
+          { data.name }
+          <ShowButton country={ data }></ShowButton>
+          </div>
         </div>
         )}
       </div>
