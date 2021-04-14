@@ -88,30 +88,37 @@ const App = () => {
   }
 
   const handleNewPersonSubmit = event => {
+    let newTemp = {name: newName, number: newNumber}
     const pushData = () => {
-      let newTemp = {name: newName, number: newNumber}
       personService.create(newTemp).then(response => {
         setPersons([...persons, response])
       })
     }
-    if(persons.length === 0){
+
+    let pushFlag = 1
+    for(let i=0; i<persons.length; i++){
+      let compareName = (persons[i].name.toLowerCase())
+                    .localeCompare(newName.toLocaleLowerCase())
+      console.log(`compare name: ${compareName}`)
+      let compareNumber = (persons[i].number).localeCompare(newNumber)
+      console.log(`compare number:${compareNumber}`)
+      if(compareName === 0 && compareNumber === 0){
+        alert(`${persons[i].name} is already added to phonebook`)
+        pushFlag = 0
+        break
+      }
+      else if(compareName === 0 && compareNumber !== 0){
+        personService.update(persons[i], newTemp).then(
+          console.log(persons)
+          // response => {setPersons(persons.filter())}
+        )
+        pushFlag = 0
+      }
+    }
+    if(pushFlag === 1){
       pushData();
     }
-    else{
-      let pushFlag = 1
-      for(let i=0; i<persons.length; i++){
-        let compare = (persons[i].name.toLowerCase())
-                      .localeCompare(newName.toLocaleLowerCase())
-        if(compare === 0){
-          alert(`${persons[i].name} is already added to phonebook`)
-          pushFlag = 0
-          break
-        }
-      }
-      if(pushFlag === 1){
-        pushData();
-      }
-    }
+
     event.preventDefault()
   }
 
