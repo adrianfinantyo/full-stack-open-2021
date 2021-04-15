@@ -42,7 +42,10 @@ const List = ({ countries, filter}) => {
       <div>
         {arrFilter.map((data, index) => 
         <div key={ index }>
-          <div style={ {padding: '10px'} }>
+          <div style={{
+            paddingTop: '10px',
+            paddingBottom: '10px'
+        }}>
           { data.name }
           <ShowButton country={ data }></ShowButton>
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import * as personService from "./Services_Person"
+import Notification from "./Notification"
 
 const Header = ({ title }) => {
   return <h1>{title}</h1>
@@ -33,7 +34,9 @@ const Form = ({ handleNewPersonSubmit, handleNewName, handleNewNumber, newName, 
 
 const DeleteButton = ({ person, deletePerson }) => {
   return(
-    <button onClick={() => deletePerson(person.id, person.name)}>Delete</button>
+    <button style={{
+      marginLeft: '5px'
+    }} onClick={() => deletePerson(person.id, person.name)}>Delete</button>
   )
 }
 
@@ -45,8 +48,11 @@ const List = ({ persons, newFilter, deletePerson }) => {
   else {
       return (
           persons.map((data, index) => (
-            <div key={ index }>
-              <p>{data.name} {data.number}</p>
+            <div key={ index } style={{
+              paddingTop: '10px',
+              paddingBottom: '10px'
+              }}>
+              {data.name} {data.number}
               <DeleteButton person={ data } deletePerson={ deletePerson }></DeleteButton>
             </div>
           )
@@ -60,6 +66,8 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
+  const [ notification, setNotification ] = useState('')
+  let tempName = ""
 
   useEffect(() => {
     personService.getAll().then(initalPersons => {
@@ -72,6 +80,8 @@ const App = () => {
       personService.deletePerson(id).then(response => {
         setPersons(persons.filter(person => person.id !== id))
       })
+      setNotification('delete')
+      tempName = name
     }
   }
 
@@ -93,25 +103,26 @@ const App = () => {
       personService.create(newTemp).then(response => {
         setPersons([...persons, response])
       })
+      setNotification('added')
+      tempName = newName
     }
 
     let pushFlag = 1
     for(let i=0; i<persons.length; i++){
       let compareName = (persons[i].name.toLowerCase())
                     .localeCompare(newName.toLocaleLowerCase())
-      console.log(`compare name: ${compareName}`)
       let compareNumber = (persons[i].number).localeCompare(newNumber)
-      console.log(`compare number:${compareNumber}`)
       if(compareName === 0 && compareNumber === 0){
         alert(`${persons[i].name} is already added to phonebook`)
         pushFlag = 0
         break
       }
       else if(compareName === 0 && compareNumber !== 0){
-        personService.update(persons[i], newTemp).then(
-          console.log(persons)
-          // response => {setPersons(persons.filter())}
-        )
+        let id = persons[i].id
+        personService.update(persons[i], newTemp).then(response => {
+          setPersons([...persons.filter(person => person.id !== id), response])})
+        setNotification('update')
+        tempName = persons[i].name
         pushFlag = 0
       }
     }
@@ -125,7 +136,8 @@ const App = () => {
   return (
     <div>
       <Header title="Phonebook"></Header>
-      <Filter newFilter={newFilter} handleNewFilter={handleNewFilter}></Filter>
+      <Notification status={ notification, tempName }></Notification>
+      <Filter newFilter={ newFilter } handleNewFilter={ handleNewFilter }></Filter>
       <Header title="add a new"></Header>
       <Form
         handleNewName={ handleNewName }
