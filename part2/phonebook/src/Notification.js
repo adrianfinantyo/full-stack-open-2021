@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import './Notification.css';
 
-const Notification = ({ status, name }) => {
-  const style ={
-
-  }
+const Notification = ({ status, tempName }) => {
   if(status === ""){
     return null
   }
   else if(status === 'added'){
-    return (
-    <div>Added {name}</div>)
+    return (<div className="added" >Added { tempName }</div>)
   }
   else if(status === 'update'){
-    return null
+    return (<div className="update" >Information of { tempName } has already been updated to server</div>)
   }
   else if(status === 'delete'){
-    return null
+    return (<div className="deleted" >Information of { tempName } has already been removed from server</div>)
   }
 }
 

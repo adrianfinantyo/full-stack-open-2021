@@ -67,7 +67,7 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
   const [ notification, setNotification ] = useState('')
-  let tempName = ""
+  const [ tempName, setTempName ] = useState('')
 
   useEffect(() => {
     personService.getAll().then(initalPersons => {
@@ -80,9 +80,9 @@ const App = () => {
       personService.deletePerson(id).then(response => {
         setPersons(persons.filter(person => person.id !== id))
       })
-      setNotification('delete')
-      tempName = name
     }
+    setTempName(name)
+    setNotification('delete')
   }
 
   const handleNewName = event => {
@@ -103,8 +103,8 @@ const App = () => {
       personService.create(newTemp).then(response => {
         setPersons([...persons, response])
       })
+      setTempName(newName)
       setNotification('added')
-      tempName = newName
     }
 
     let pushFlag = 1
@@ -121,8 +121,8 @@ const App = () => {
         let id = persons[i].id
         personService.update(persons[i], newTemp).then(response => {
           setPersons([...persons.filter(person => person.id !== id), response])})
+        setTempName(persons[i].name)
         setNotification('update')
-        tempName = persons[i].name
         pushFlag = 0
       }
     }
@@ -136,7 +136,7 @@ const App = () => {
   return (
     <div>
       <Header title="Phonebook"></Header>
-      <Notification status={ notification, tempName }></Notification>
+      <Notification status={ notification} tempName={ tempName }></Notification>
       <Filter newFilter={ newFilter } handleNewFilter={ handleNewFilter }></Filter>
       <Header title="add a new"></Header>
       <Form
